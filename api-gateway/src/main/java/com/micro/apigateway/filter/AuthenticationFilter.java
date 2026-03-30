@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 
 import com.micro.apigateway.util.JwtUtil;
@@ -26,6 +27,9 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
     @Override
     public GatewayFilter apply(Config config) {
         return ((exchange, chain) -> {
+            if (HttpMethod.OPTIONS.equals(exchange.getRequest().getMethod())) {
+                return chain.filter(exchange);
+            }
             if (validator.isSecured.test(exchange.getRequest())) {
                 //header contains token or not
                 if (!exchange.getRequest().getHeaders().containsKey(HttpHeaders.AUTHORIZATION)) {
