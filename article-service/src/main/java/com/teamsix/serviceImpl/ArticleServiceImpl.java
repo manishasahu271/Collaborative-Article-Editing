@@ -202,19 +202,19 @@ public class ArticleServiceImpl implements ArticleService{
 
 	@Override
 	public Article setArticleStatus(String articleId, String status) {
-		ArticleDto article= this.getLatestArticleByArticleId(articleId).getBody();
-		if(status.equalsIgnoreCase("approved"))
-		article.setStatus(Status.approved);
-		if(status.equalsIgnoreCase("rejected"))
-			article.setStatus(Status.rejected);
-		else
-			article.setStatus(Status.in_progress);
-       System.out.println(article.getStatus());
-	      List<Article> articleList=articleRepository.findByArticleId(articleId);
-		  Article finalArticle=articleList.get(articleList.size()-1);
-		  finalArticle.setStatus(Status.approved);
-        return articleRepository.save(finalArticle);
-
+		List<Article> articleList = articleRepository.findByArticleId(articleId);
+		if (articleList == null || articleList.isEmpty()) {
+			throw new IllegalArgumentException("No article rows for articleId: " + articleId);
+		}
+		Article finalArticle = articleList.get(articleList.size() - 1);
+		if (status != null && status.equalsIgnoreCase("approved")) {
+			finalArticle.setStatus(Status.approved);
+		} else if (status != null && status.equalsIgnoreCase("rejected")) {
+			finalArticle.setStatus(Status.rejected);
+		} else {
+			finalArticle.setStatus(Status.in_progress);
+		}
+		return articleRepository.save(finalArticle);
 	}
 
 

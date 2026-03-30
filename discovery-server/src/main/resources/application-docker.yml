@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: discovery-server
+
+eureka:
+  instance:
+    hostname: discovery-server
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health

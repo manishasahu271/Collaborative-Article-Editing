@@ -29,7 +29,8 @@ public class AuthConfig {
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		return http.csrf().disable()
 				.authorizeHttpRequests()
-				.requestMatchers("/auth/register", "/auth/token", "/auth/validate").permitAll()
+				.requestMatchers("/auth/register", "/auth/token", "/auth/validate",
+						"/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
 				.requestMatchers("/user/**").hasAnyRole("AUTHOR", "EDITOR")
 				.anyRequest().authenticated()
 				.and().build();

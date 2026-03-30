@@ -1,0 +1,111 @@
+@import "tailwindcss";
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Playfair+Display:wght@500;600;700&display=swap');
+
+:root {
+  --bg: #fdfbf7;
+  --surface: #ffffff;
+  --text-primary: #1a1a1a;
+  --text-secondary: #6b6b6b;
+  --accent: #8b5cf6;
+  --accent-hover: #7c3aed;
+  --border-subtle: #e8e4dd;
+  --success: #059669;
+  --warning: #d97706;
+  --danger: #dc2626;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: radial-gradient(circle at top left, #f5f1eb 0, #fdfbf7 40%, #fdfbf7 100%);
+  color: var(--text-primary);
+  font-family: 'Lora', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    sans-serif;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: 'Playfair Display', 'Times New Roman', serif;
+  letter-spacing: 0.02em;
+}
+
+.editorial-card {
+  background: var(--surface);
+  border-radius: 12px;
+  border: 1px solid var(--border-subtle);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.btn-primary {
+  @apply inline-flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium;
+  background-color: var(--accent);
+  color: white;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  background-color: var(--accent-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(139, 92, 246, 0.35);
+}
+
+.btn-ghost {
+  @apply inline-flex items-center justify-center px-4 py-2 rounded-md text-sm font-medium;
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  background-color: rgba(255, 255, 255, 0.7);
+  transition: all 0.2s ease;
+}
+
+.btn-ghost:hover {
+  background-color: #f5f1eb;
+}
+
+.input {
+  @apply w-full px-3 py-2 rounded-md text-sm;
+  border: 1px solid var(--border-subtle);
+  background-color: #fdfbf7;
+  transition: all 0.15s ease;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px rgba(139, 92, 246, 0.4);
+  background-color: #ffffff;
+}
+
+.typewriter {
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: 2px solid #8b5cf6;
+  animation: typing 3s steps(30) 1s forwards, blink 0.75s step-end infinite;
+}
+
+@keyframes typing {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+@keyframes blink {
+  50% {
+    border-color: transparent;
+  }
+}

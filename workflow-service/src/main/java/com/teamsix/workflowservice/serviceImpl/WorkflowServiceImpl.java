@@ -4,6 +4,8 @@ import com.teamsix.workflowservice.customException.GlobalException;
 import com.teamsix.workflowservice.entity.EditorChanges;
 import com.teamsix.workflowservice.entity.ReviewerFeedback;
 import com.teamsix.workflowservice.entity.WorkFlow;
+import com.teamsix.workflowservice.event.ArticleStatusEvent;
+import com.teamsix.workflowservice.event.ArticleStatusProducer;
 import com.teamsix.workflowservice.openFeign.ArticleFeign;
 import com.teamsix.workflowservice.payload.ArticleDto;
 import com.teamsix.workflowservice.repo.EditorChangesRepo;
@@ -38,6 +40,9 @@ public class WorkflowServiceImpl implements WorkflowService {
     ModelMapper modelMapper;
     @Autowired
     ArticleFeign articleFeign;
+
+    @Autowired
+    ArticleStatusProducer articleStatusProducer;
 
 
     @Override
@@ -76,7 +81,17 @@ public class WorkflowServiceImpl implements WorkflowService {
         WorkFlow workFlowres = this.getWorkFlowByArticleId(articleId);
         if (status == "" || status == null) throw new GlobalException("review status empty or null");
         workFlowres.getReviewerFeedback().setReviewStatus(status);
-        return workflowRepo.save(workFlowres);
+        workFlowres = workflowRepo.save(workFlowres);
+        if ("approved".equalsIgnoreCase(status) || "rejected".equalsIgnoreCase(status)) {
+            ArticleStatusEvent event = new ArticleStatusEvent(
+                    articleId,
+                    status,
+                    workFlowres.getReviewerUserId(),
+                    workFlowres.getReviewerFeedback() != null ? workFlowres.getReviewerFeedback().getReviewFeedback() : null,
+                    LocalDateTime.now());
+            articleStatusProducer.publishStatusChange(event);
+        }
+        return workFlowres;
     }
 
     @Override

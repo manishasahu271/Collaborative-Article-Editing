@@ -1,17 +1,18 @@
 package com.teamsix.workflowservice.payload;
 
-import lombok.*;
+import jakarta.persistence.Embeddable;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString
-@Getter
-@Setter
+@Embeddable
 public class UserDto {
-    private Long userId;
-    private String username;
-    private String role;
-
+	private Long userId;
+	private String username;
+	private String role;
 }
