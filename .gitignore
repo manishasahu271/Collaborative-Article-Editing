@@ -1,0 +1,29 @@
+### macOS / OS junk
+.DS_Store
+
+### Java / Maven / Gradle
+**/target/
+*.class
+*.jar
+
+### Node / Vite
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+node_modules/
+dist/
+
+### IDE / editor
+.vscode/
+.idea/
+*.iml
+
+### Eclipse metadata
+.classpath
+.project
+.factorypath
+.settings/
+
+### Logs / env
+*.log
+.env
