@@ -176,19 +176,21 @@ services:
         condition: service_started
       workflow-service:
         condition: service_started
-    expose:
-      - "9191"
+    ports:
+      - "9191:9191"
     networks:
       - backend
 
   caddy:
     image: caddy:2.8-alpine
+    profiles:
+      - domain
     restart: unless-stopped
     depends_on:
       - api-gateway
     environment:
-      API_DOMAIN: ${API_DOMAIN}
-      ACME_EMAIL: ${ACME_EMAIL}
+      API_DOMAIN: ${API_DOMAIN:-}
+      ACME_EMAIL: ${ACME_EMAIL:-}
     ports:
       - "80:80"
       - "443:443"

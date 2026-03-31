@@ -157,16 +157,18 @@ For the simplest production setup, keep the frontend on Vercel and run the full 
 - Production env template: `deploy/backend.env.example`
 - Full VM guide: `docs/one-host-docker-compose-deployment.md`
 
-Quick start on the VM:
+Quick start on the VM using the public VM IP directly:
 
 ```bash
 cp deploy/backend.env.example deploy/backend.env
-# edit deploy/backend.env with your real domain/email/password
+# edit deploy/backend.env with a strong MYSQL_ROOT_PASSWORD
 docker compose --env-file deploy/backend.env -f docker-compose.backend.yml up -d --build
 ```
 
 Point Vercel to:
 
 ```env
-VITE_API_BASE_URL=https://api.yourdomain.com
+VITE_API_BASE_URL=http://YOUR_VM_IP:9191
 ```
+
+Later, once you buy a domain, you can enable the optional `domain` profile and switch Vercel to `https://api.yourdomain.com`.

@@ -2,12 +2,15 @@
 
 This guide deploys the full backend stack on one Linux VM and keeps the frontend on Vercel.
 
+For now, you can use the VM public IP directly and skip domain/DNS setup. Once you buy a domain later, you can enable the optional Caddy HTTPS profile.
+
 ## Recommended Host
 
 - OS: Ubuntu 22.04 or 24.04 LTS
 - Size: 2 vCPU / 4 GB RAM minimum
 - Providers: Hetzner CX22, DigitalOcean Basic 4 GB, AWS EC2 `t3.medium`
-- Public DNS: point `api.yourdomain.com` to the VM public IP
+- Temporary option: use `http://YOUR_VM_IP:9191`
+- Later option: point `api.yourdomain.com` to the VM public IP
 
 For this repository, one VM is the fastest production path because Eureka, Kafka, MySQL, and the Spring services can stay on one private Docker network.
 
@@ -29,7 +32,7 @@ For this repository, one VM is the fastest production path because Eureka, Kafka
 - `version-control-service`
 - `workflow-service`
 - `api-gateway`
-- `caddy`
+- `caddy` only when you enable the optional `domain` profile
 
 This production stack intentionally skips:
 
@@ -74,15 +77,34 @@ cp deploy/backend.env.example deploy/backend.env
 nano deploy/backend.env
 ```
 
-Set:
+For VM-IP-only deployment, you only need:
+
+```env
+MYSQL_ROOT_PASSWORD=replace-with-a-strong-password
+```
+
+Optional values for later if you buy a domain and want HTTPS:
 
 ```env
 API_DOMAIN=api.yourdomain.com
 ACME_EMAIL=you@example.com
-MYSQL_ROOT_PASSWORD=replace-with-a-strong-password
 ```
 
-## 4. Point DNS To The VM
+## 4. Start The Backend Stack
+
+For the temporary VM-IP path:
+
+```bash
+docker compose --env-file deploy/backend.env -f docker-compose.backend.yml up -d --build
+```
+
+This starts `api-gateway` on:
+
+```text
+http://YOUR_VM_IP:9191
+```
+
+## 5. Optional Domain Setup Later
 
 Create an `A` record:
 
@@ -91,10 +113,10 @@ Create an `A` record:
 
 Wait until DNS resolves before starting Caddy, otherwise HTTPS certificate issuance will fail.
 
-## 5. Start The Backend Stack
+To enable HTTPS later:
 
 ```bash
-docker compose --env-file deploy/backend.env -f docker-compose.backend.yml up -d --build
+docker compose --env-file deploy/backend.env -f docker-compose.backend.yml --profile domain up -d --build
 ```
 
 Check container status:
@@ -121,14 +143,13 @@ Expect this order:
 4. `discovery-server`
 5. all Spring services
 6. `api-gateway`
-7. `caddy`
+7. `caddy` only if using the `domain` profile
 
 Useful checks:
 
 ```bash
 curl http://localhost:9191/auth/token
-curl -I http://localhost
-curl -I https://api.yourdomain.com
+curl http://YOUR_VM_IP:9191/auth/token
 ```
 
 If you want to inspect Eureka from inside the VM:
@@ -137,12 +158,12 @@ If you want to inspect Eureka from inside the VM:
 docker compose --env-file deploy/backend.env -f docker-compose.backend.yml exec discovery-server wget -qO- http://localhost:8761
 ```
 
-## 7. Connect Vercel
+## 6. Connect Vercel
 
 In Vercel, set:
 
 ```env
-VITE_API_BASE_URL=https://api.yourdomain.com
+VITE_API_BASE_URL=http://YOUR_VM_IP:9191
 ```
 
 Apply it to:
@@ -152,12 +173,18 @@ Apply it to:
 
 Then redeploy the frontend.
 
-## 8. Validate CORS And Login
+Later, after you buy a domain and enable Caddy, change it to:
+
+```env
+VITE_API_BASE_URL=https://api.yourdomain.com
+```
+
+## 7. Validate CORS And Login
 
 From your local machine, test preflight:
 
 ```bash
-curl -i -X OPTIONS "https://api.yourdomain.com/auth/token" \
+curl -i -X OPTIONS "http://YOUR_VM_IP:9191/auth/token" \
   -H "Origin: https://your-vercel-app.vercel.app" \
   -H "Access-Control-Request-Method: POST" \
   -H "Access-Control-Request-Headers: content-type,authorization"
@@ -176,7 +203,7 @@ Then test in the browser:
 4. Assign editor / reviewer
 5. Approve or reject an article
 
-## 9. Day-2 Commands
+## 8. Day-2 Commands
 
 Update after pulling new commits:
 
@@ -202,9 +229,10 @@ Stop without deleting MySQL data:
 - Safe: `down`
 - Data is preserved in the named Docker volume `mysql-data`
 
-## 10. Production Notes
+## 9. Production Notes
 
-- Only `caddy` should expose ports publicly.
+- For the temporary VM-IP path, `api-gateway` is exposed publicly on `9191`.
+- After moving to a real domain, use the `domain` profile so `caddy` handles `80/443`.
 - All application services stay on the internal `backend` network.
 - The compose file keeps the current microservice topology unchanged, so no app code changes are required to run on one host.
 - ELK can be added later from the original `docker-compose.yml` if you need centralized logs.
