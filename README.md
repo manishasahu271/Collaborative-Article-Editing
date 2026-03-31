@@ -147,3 +147,26 @@ Then open:
 - Eureka Dashboard: http://localhost:8761
 - Kibana (Logs): http://localhost:5601
 - Swagger (Article API): http://localhost:9002/swagger-ui.html
+
+## One-Host Production Deployment
+
+For the simplest production setup, keep the frontend on Vercel and run the full backend stack on one Linux VM with Docker Compose.
+
+- Production compose file: `docker-compose.backend.yml`
+- Reverse proxy config: `deploy/Caddyfile`
+- Production env template: `deploy/backend.env.example`
+- Full VM guide: `docs/one-host-docker-compose-deployment.md`
+
+Quick start on the VM:
+
+```bash
+cp deploy/backend.env.example deploy/backend.env
+# edit deploy/backend.env with your real domain/email/password
+docker compose --env-file deploy/backend.env -f docker-compose.backend.yml up -d --build
+```
+
+Point Vercel to:
+
+```env
+VITE_API_BASE_URL=https://api.yourdomain.com
+```

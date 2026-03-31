@@ -1,0 +1,10 @@
+{
+	email {$ACME_EMAIL}
+}
+
+{$API_DOMAIN} {
+	encode gzip
+
+	# Forward all browser traffic to the Spring Cloud API Gateway.
+	reverse_proxy api-gateway:9191
+}
