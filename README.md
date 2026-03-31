@@ -148,6 +148,63 @@ Then open:
 - Kibana (Logs): http://localhost:5601
 - Swagger (Article API): http://localhost:9002/swagger-ui.html
 
+## Live Demo
+
+- Frontend demo: `https://collaborative-article-editing-lu2xofi8c.vercel.app/`
+
+Important:
+
+- The Vercel demo frontend needs a running backend.
+- If the backend/ngrok tunnel is not running, the UI may open but API calls will fail.
+- For a permanent always-on demo, deploy the backend to a real VM or cloud host instead of a local machine.
+
+## Run After Cloning
+
+If you download the codebase from GitHub and want to run it on your own machine, use one of these options.
+
+### Option 1: Full Local Stack
+
+This starts frontend, backend, MySQL, Kafka, Eureka, and ELK locally with Docker Compose.
+
+```bash
+git clone https://github.com/manishasahu271/Collaborative-Article-Editing.git
+cd Collaborative-Article-Editing
+docker compose up --build
+```
+
+Then open:
+
+- Frontend: `http://localhost:3000`
+- API Gateway: `http://localhost:9191`
+- Eureka: `http://localhost:8761`
+
+### Option 2: Use The Vercel Frontend With Your Local Backend
+
+This is useful if you want to use the hosted frontend while running the backend on your own machine.
+
+1. Start the backend:
+
+```bash
+git clone https://github.com/manishasahu271/Collaborative-Article-Editing.git
+cd Collaborative-Article-Editing
+printf 'MYSQL_ROOT_PASSWORD=1234554321\n' > deploy/backend.env
+docker compose --env-file deploy/backend.env -f docker-compose.backend.yml up -d --build
+```
+
+2. Start ngrok in a separate terminal:
+
+```bash
+ngrok http 9191
+```
+
+3. Use the generated ngrok HTTPS URL as `VITE_API_BASE_URL` if you deploy your own Vercel frontend.
+
+Important:
+
+- Keep the Docker containers running.
+- Keep the ngrok terminal running.
+- If ngrok stops, the hosted frontend will lose backend access.
+
 ## One-Host Production Deployment
 
 For the simplest production setup, keep the frontend on Vercel and run the full backend stack on one Linux VM with Docker Compose.
